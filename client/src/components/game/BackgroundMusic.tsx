@@ -7,8 +7,99 @@ interface BackgroundMusicProps {
 export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const oscillatorRef = useRef<OscillatorNode | null>(null);
   
-  // Control music playback based on game state
+  // Создаем и начинаем синтезированную музыку
+  useEffect(() => {
+    // Функция для создания последовательности нот Тетрис мелодии
+    const createTetrisTheme = () => {
+      try {
+        if (!audioContextRef.current) {
+          // @ts-ignore - AudioContext может не поддерживаться в старых браузерах
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          audioContextRef.current = new AudioContext();
+        }
+        
+        const ctx = audioContextRef.current;
+        
+        // Создаем гейн-нод для управления громкостью
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 0.15; // Устанавливаем низкую громкость
+        gainNode.connect(ctx.destination);
+        
+        // Основная мелодия Тетриса (ноты в виде частот)
+        const tetrisNotes = [
+          659.25, // E5
+          493.88, // B4
+          523.25, // C5
+          587.33, // D5
+          523.25, // C5
+          493.88, // B4
+          440.00, // A4
+          440.00, // A4
+          523.25, // C5
+          587.33, // D5
+          659.25, // E5
+          587.33, // D5
+          523.25, // C5
+          493.88, // B4
+          493.88  // B4
+        ];
+        
+        // Длительность каждой ноты в секундах
+        const noteDuration = 0.2;
+        
+        // Запускаем ноты последовательно
+        let time = ctx.currentTime;
+        
+        // Функция для проигрывания одной ноты
+        const playNote = (frequency: number, time: number) => {
+          const oscillator = ctx.createOscillator();
+          oscillator.type = 'square'; // Квадратная волна даёт чипсет-звучание
+          oscillator.frequency.value = frequency;
+          
+          oscillator.connect(gainNode);
+          oscillator.start(time);
+          oscillator.stop(time + noteDuration);
+        };
+        
+        // Проигрываем все ноты последовательно
+        for (let i = 0; i < tetrisNotes.length; i++) {
+          playNote(tetrisNotes[i], time);
+          time += noteDuration;
+        }
+        
+        // Циклически воспроизводим мелодию
+        const loopInterval = noteDuration * tetrisNotes.length;
+        const loopMusic = setInterval(() => {
+          if (!isMuted && isPlaying && audioContextRef.current) {
+            time = audioContextRef.current.currentTime;
+            for (let i = 0; i < tetrisNotes.length; i++) {
+              playNote(tetrisNotes[i], time);
+              time += noteDuration;
+            }
+          }
+        }, loopInterval * 1000);
+        
+        return () => clearInterval(loopMusic);
+      } catch (error) {
+        console.error('Web Audio API is not supported in this browser', error);
+      }
+    };
+    
+    if (isPlaying && !isMuted) {
+      const cleanup = createTetrisTheme();
+      return () => {
+        if (cleanup) cleanup();
+        if (audioContextRef.current) {
+          audioContextRef.current.close().catch(console.error);
+        }
+      };
+    }
+  }, [isPlaying, isMuted]);
+  
+  // Control audio element playback (fallback)
   useEffect(() => {
     if (audioRef.current) {
       if (isPlaying && !isMuted) {
@@ -21,7 +112,7 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
     }
   }, [isPlaying, isMuted]);
   
-  // Set volume
+  // Set volume for audio element
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = 0.3; // 30% volume
@@ -30,6 +121,13 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
   
   const toggleMute = () => {
     setIsMuted(!isMuted);
+    
+    // Если есть активный Audio Context, приостановить его при включении тишины
+    if (!isMuted && audioContextRef.current) {
+      audioContextRef.current.suspend();
+    } else if (isMuted && audioContextRef.current) {
+      audioContextRef.current.resume();
+    }
   };
   
   return (
@@ -55,15 +153,29 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
         )}
       </button>
       
+      {/* 
+        Обычно здесь мы бы подключили mp3-файл:
+        <audio 
+          ref={audioRef}
+          loop
+          preload="auto"
+          style={{ display: 'none' }}
+        >
+          <source src="/music/tetris-theme.mp3" type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+        
+        Но поскольку у нас нет реального аудиофайла, мы используем синтезируемую музыку через Web Audio API:
+      */}
+      
       <audio 
         ref={audioRef}
         loop
         preload="auto"
+        src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAJrQC2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2tra2trb///////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAVJkgAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
         style={{ display: 'none' }}
-      >
-        <source src="/music/tetris-theme.mp3" type="audio/mpeg" />
-        Your browser does not support the audio element.
-      </audio>
+      />
+      
     </div>
   );
 }
