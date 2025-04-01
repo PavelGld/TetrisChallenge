@@ -28,12 +28,14 @@ export default function GameBoard({ gameBoard, isGameOver, isPaused, restartGame
             block && (
               <div
                 key={`${x}-${y}`}
-                className={`tetris-block absolute bg-tetris-${block.type.toLowerCase()} rounded-sm`}
+                className={`tetris-block absolute rounded-sm bg-tetris-${block.type.toLowerCase()}`}
                 style={{
                   width: '10%',
                   height: '5%',
                   top: `${y * 5}%`,
                   left: `${x * 10}%`,
+                  boxShadow: 'inset 3px 3px 6px rgba(255, 255, 255, 0.4), inset -3px -3px 6px rgba(0, 0, 0, 0.4)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}
               ></div>
             )

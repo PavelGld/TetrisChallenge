@@ -20,6 +20,15 @@ style.textContent = `
     --tetris-z: #FF0000;
   }
   
+  /* Explicit block colors */
+  .bg-tetris-i { background-color: #00FFFF !important; }
+  .bg-tetris-j { background-color: #0000FF !important; }
+  .bg-tetris-l { background-color: #FF8800 !important; }
+  .bg-tetris-o { background-color: #FFFF00 !important; }
+  .bg-tetris-s { background-color: #00FF00 !important; }
+  .bg-tetris-t { background-color: #9900FF !important; }
+  .bg-tetris-z { background-color: #FF0000 !important; }
+  
   body {
     background: linear-gradient(to bottom, #1a2a3a, #0a1a2a);
     min-height: 100vh;

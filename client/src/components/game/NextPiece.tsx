@@ -28,6 +28,10 @@ export default function NextPiece({ nextPiece }: NextPieceProps) {
             <div
               key={`${x}-${y}`}
               className={`next-block ${filled ? `bg-tetris-${nextPiece.type.toLowerCase()} rounded-sm` : 'opacity-0'}`}
+              style={filled ? {
+                boxShadow: 'inset 2px 2px 4px rgba(255, 255, 255, 0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.4)',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              } : {}}
             ></div>
           ))
         )}
