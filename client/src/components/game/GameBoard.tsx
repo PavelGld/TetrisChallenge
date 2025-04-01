@@ -65,7 +65,9 @@ export default function GameBoard({
   };
 
   return (
-    <div className="relative bg-tetris-bg bg-opacity-60 border-2 border-tetris-border rounded-md overflow-hidden">
+    <div className="relative bg-tetris-bg bg-opacity-60 border-2 border-tetris-border rounded-md overflow-hidden" style={{
+      boxShadow: '0 0 20px rgba(100, 200, 255, 0.3), inset 0 0 15px rgba(100, 200, 255, 0.2)',
+    }}>
       {/* Grid overlay for visual effect */}
       <div className="absolute inset-0 grid grid-cols-10 grid-rows-20 gap-px pointer-events-none">
         {Array.from({ length: 200 }).map((_, i) => (

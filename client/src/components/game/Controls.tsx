@@ -45,22 +45,32 @@ export default function Controls({
   };
 
   return (
-    <div className="bg-tetris-bg bg-opacity-70 border-2 border-tetris-border rounded-md p-4">
-      <h3 className="font-game text-sm text-cyan-300 mb-3">CONTROLS</h3>
+    <div className="bg-tetris-bg bg-opacity-70 border-2 border-tetris-border rounded-md p-4" style={{
+      boxShadow: '0 0 15px rgba(100, 200, 255, 0.2), inset 0 0 10px rgba(100, 200, 255, 0.1)',
+    }}>
+      <h3 className="font-game text-sm bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text mb-3">CONTROLS</h3>
       
       {/* Action Buttons */}
       <div className="flex gap-3 mb-4">
         <button 
           id="start-pause" 
-          className="game-btn bg-tetris-i bg-opacity-70 hover:bg-opacity-90 py-2 px-4 rounded font-game text-sm flex-grow"
+          className="game-btn bg-tetris-i bg-opacity-70 hover:bg-opacity-90 py-2 px-4 rounded font-game text-sm flex-grow transition-all duration-150 transform hover:scale-105"
           onClick={togglePause}
+          style={{ 
+            boxShadow: '0 0 10px rgba(0, 225, 255, 0.3)',
+            textShadow: '0 0 5px rgba(0, 200, 255, 0.5)'
+          }}
         >
           {getStartPauseText()}
         </button>
         <button 
           id="restart" 
-          className="game-btn bg-tetris-z bg-opacity-70 hover:bg-opacity-90 py-2 px-4 rounded font-game text-sm flex-grow"
+          className="game-btn bg-tetris-z bg-opacity-70 hover:bg-opacity-90 py-2 px-4 rounded font-game text-sm flex-grow transition-all duration-150 transform hover:scale-105"
           onClick={restartGame}
+          style={{ 
+            boxShadow: '0 0 10px rgba(255, 50, 50, 0.3)',
+            textShadow: '0 0 5px rgba(255, 100, 100, 0.5)'
+          }}
         >
           RESTART
         </button>
@@ -90,34 +100,55 @@ export default function Controls({
       <div className={`mobile-controls ${isMobile ? 'flex' : 'hidden'} flex-wrap justify-center mt-4 gap-2`}>
         <div className="grid grid-cols-3 gap-2 w-full">
           <button
-            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center"
+            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center transition-all duration-150"
             onTouchStart={(e) => { e.preventDefault(); moveLeft(); }}
+            style={{ 
+              boxShadow: '0 0 8px rgba(0, 200, 255, 0.3)',
+              border: '1px solid rgba(100, 200, 255, 0.2)'
+            }}
           >
-            <i className="ri-arrow-left-s-line text-2xl">←</i>
+            <i className="ri-arrow-left-s-line text-2xl text-cyan-300">←</i>
           </button>
           <button
-            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center"
+            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center transition-all duration-150"
             onTouchStart={(e) => { e.preventDefault(); rotate(); }}
+            style={{ 
+              boxShadow: '0 0 8px rgba(0, 200, 255, 0.3)',
+              border: '1px solid rgba(100, 200, 255, 0.2)'
+            }}
           >
-            <i className="ri-arrow-up-s-line text-2xl">↑</i>
+            <i className="ri-arrow-up-s-line text-2xl text-cyan-300">↑</i>
           </button>
           <button
-            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center"
+            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center transition-all duration-150"
             onTouchStart={(e) => { e.preventDefault(); moveRight(); }}
+            style={{ 
+              boxShadow: '0 0 8px rgba(0, 200, 255, 0.3)',
+              border: '1px solid rgba(100, 200, 255, 0.2)'
+            }}
           >
-            <i className="ri-arrow-right-s-line text-2xl">→</i>
+            <i className="ri-arrow-right-s-line text-2xl text-cyan-300">→</i>
           </button>
           <button
-            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center"
+            className="control-btn col-span-1 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center transition-all duration-150"
             onTouchStart={(e) => { e.preventDefault(); softDrop(); }}
+            style={{ 
+              boxShadow: '0 0 8px rgba(0, 200, 255, 0.3)',
+              border: '1px solid rgba(100, 200, 255, 0.2)'
+            }}
           >
-            <i className="ri-arrow-down-s-line text-2xl">↓</i>
+            <i className="ri-arrow-down-s-line text-2xl text-cyan-300">↓</i>
           </button>
           <button
-            className="control-btn col-span-2 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center"
+            className="control-btn col-span-2 bg-gray-700 bg-opacity-70 h-14 rounded flex items-center justify-center transition-all duration-150"
             onTouchStart={(e) => { e.preventDefault(); hardDrop(); }}
+            style={{ 
+              boxShadow: '0 0 8px rgba(0, 200, 255, 0.3)',
+              border: '1px solid rgba(100, 200, 255, 0.2)'
+            }}
           >
-            <span className="text-2xl mr-1">⎵</span> DROP
+            <span className="text-2xl mr-1 text-cyan-300">⎵</span> 
+            <span className="text-cyan-300">DROP</span>
           </button>
         </div>
       </div>

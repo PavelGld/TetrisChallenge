@@ -39,33 +39,37 @@ export default function InfoPanel({
   return (
     <div className="w-full md:w-auto flex flex-col gap-6">
       {/* Score Section */}
-      <div className="bg-tetris-bg bg-opacity-70 border-2 border-tetris-border rounded-md p-4 w-full">
+      <div className="bg-tetris-bg bg-opacity-70 border-2 border-tetris-border rounded-md p-4 w-full" style={{
+        boxShadow: '0 0 15px rgba(100, 200, 255, 0.2), inset 0 0 10px rgba(100, 200, 255, 0.1)',
+      }}>
         <div className="flex flex-col gap-4">
           <div className="space-y-1">
-            <h3 className="font-game text-sm text-cyan-300">SCORE</h3>
+            <h3 className="font-game text-sm text-cyan-300 bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text">SCORE</h3>
             <p id="score" className="font-game text-2xl">{score}</p>
           </div>
           
           <div className="space-y-1">
-            <h3 className="font-game text-sm text-cyan-300">LEVEL</h3>
+            <h3 className="font-game text-sm text-cyan-300 bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text">LEVEL</h3>
             <p id="level" className="font-game text-2xl">{level}</p>
           </div>
           
           <div className="space-y-1">
-            <h3 className="font-game text-sm text-cyan-300">LINES</h3>
+            <h3 className="font-game text-sm text-cyan-300 bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text">LINES</h3>
             <p id="lines" className="font-game text-2xl">{lines}</p>
           </div>
           
           <div className="space-y-1">
-            <h3 className="font-game text-sm text-cyan-300">HIGH SCORE</h3>
+            <h3 className="font-game text-sm text-cyan-300 bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text">HIGH SCORE</h3>
             <p id="high-score" className="font-game text-2xl">{highScore}</p>
           </div>
         </div>
       </div>
       
       {/* Next Piece Preview */}
-      <div className="bg-tetris-bg bg-opacity-70 border-2 border-tetris-border rounded-md p-4">
-        <h3 className="font-game text-sm text-cyan-300 mb-2">NEXT</h3>
+      <div className="bg-tetris-bg bg-opacity-70 border-2 border-tetris-border rounded-md p-4" style={{
+        boxShadow: '0 0 15px rgba(100, 200, 255, 0.2), inset 0 0 10px rgba(100, 200, 255, 0.1)',
+      }}>
+        <h3 className="font-game text-sm bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text mb-2">NEXT</h3>
         <NextPiece nextPiece={nextPiece} />
       </div>
       

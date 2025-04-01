@@ -9,44 +9,230 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
   }
 }
 
-/* Tetris Block Colors */
+/* Space Background Animation */
+@keyframes animateStar {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(2000px);
+  }
+}
+
+.space-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.stars {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 
+    1744px 122px #fff,
+    134px 1321px #fff,
+    571px 880px #fff,
+    1019px 1213px #fff,
+    1308px 1760px #fff,
+    925px 1940px #fff,
+    1183px 1422px #fff,
+    843px 1026px #fff,
+    120px 1528px #fff,
+    890px 1998px #fff,
+    248px 821px #fff,
+    1464px 1588px #fff,
+    1748px 583px #fff,
+    1878px 898px #fff,
+    33px 1402px #fff,
+    1789px 533px #fff,
+    1077px 1589px #fff,
+    1580px 1758px #fff,
+    1236px 177px #fff,
+    348px 1520px #fff;
+  animation: animateStar 100s linear infinite;
+}
+
+.stars:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 
+    1744px 122px #fff,
+    134px 1321px #fff,
+    571px 880px #fff,
+    1019px 1213px #fff,
+    1308px 1760px #fff,
+    925px 1940px #fff,
+    1183px 1422px #fff,
+    843px 1026px #fff,
+    120px 1528px #fff,
+    890px 1998px #fff,
+    248px 821px #fff,
+    1464px 1588px #fff,
+    1748px 583px #fff,
+    1878px 898px #fff,
+    33px 1402px #fff,
+    1789px 533px #fff,
+    1077px 1589px #fff,
+    1580px 1758px #fff,
+    1236px 177px #fff,
+    348px 1520px #fff;
+}
+
+.stars2 {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  box-shadow: 
+    1164px 621px #fff,
+    212px 932px #fff,
+    1491px 1459px #fff,
+    214px 1939px #fff,
+    1598px 558px #fff,
+    1051px 341px #fff,
+    1324px 1359px #fff,
+    498px 1501px #fff,
+    264px 439px #fff,
+    1608px 558px #fff,
+    1744px 490px #fff,
+    394px 577px #fff,
+    1419px 1871px #fff,
+    916px 1231px #fff,
+    805px 782px #fff,
+    1877px 1341px #fff,
+    368px 16px #fff,
+    1192px 1196px #fff,
+    1174px 1287px #fff,
+    275px 380px #fff;
+  animation: animateStar 150s linear infinite;
+}
+
+.stars2:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  box-shadow: 
+    1164px 621px #fff,
+    212px 932px #fff,
+    1491px 1459px #fff,
+    214px 1939px #fff,
+    1598px 558px #fff,
+    1051px 341px #fff,
+    1324px 1359px #fff,
+    498px 1501px #fff,
+    264px 439px #fff,
+    1608px 558px #fff,
+    1744px 490px #fff,
+    394px 577px #fff,
+    1419px 1871px #fff,
+    916px 1231px #fff,
+    805px 782px #fff,
+    1877px 1341px #fff,
+    368px 16px #fff,
+    1192px 1196px #fff,
+    1174px 1287px #fff,
+    275px 380px #fff;
+}
+
+.stars3 {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: transparent;
+  box-shadow: 
+    1106px 610px rgba(255,255,255,0.8),
+    1341px 95px rgba(255,255,255,0.8),
+    146px 911px rgba(255,255,255,0.8),
+    1301px 1672px rgba(255,255,255,0.8),
+    1537px 1869px rgba(255,255,255,0.8),
+    1169px 1378px rgba(255,255,255,0.8),
+    175px 471px rgba(255,255,255,0.8),
+    114px 1539px rgba(255,255,255,0.8),
+    73px 1480px rgba(255,255,255,0.8),
+    408px 835px rgba(255,255,255,0.8);
+  animation: animateStar 200s linear infinite;
+}
+
+.stars3:after {
+  content: " ";
+  position: absolute;
+  top: 2000px;
+  width: 3px;
+  height: 3px;
+  background: transparent;
+  box-shadow: 
+    1106px 610px rgba(255,255,255,0.8),
+    1341px 95px rgba(255,255,255,0.8),
+    146px 911px rgba(255,255,255,0.8),
+    1301px 1672px rgba(255,255,255,0.8),
+    1537px 1869px rgba(255,255,255,0.8),
+    1169px 1378px rgba(255,255,255,0.8),
+    175px 471px rgba(255,255,255,0.8),
+    114px 1539px rgba(255,255,255,0.8),
+    73px 1480px rgba(255,255,255,0.8),
+    408px 835px rgba(255,255,255,0.8);
+}
+
+/* Tetris Block Colors with Cosmic Glow */
 .bg-tetris-i {
   background-color: rgb(0, 240, 240); /* Cyan */
+  box-shadow: 0 0 10px rgba(0, 240, 240, 0.7);
 }
 
 .bg-tetris-j {
   background-color: rgb(0, 0, 240); /* Blue */
+  box-shadow: 0 0 10px rgba(0, 0, 240, 0.7);
 }
 
 .bg-tetris-l {
   background-color: rgb(240, 160, 0); /* Orange */
+  box-shadow: 0 0 10px rgba(240, 160, 0, 0.7);
 }
 
 .bg-tetris-o {
   background-color: rgb(240, 240, 0); /* Yellow */
+  box-shadow: 0 0 10px rgba(240, 240, 0, 0.7);
 }
 
 .bg-tetris-s {
   background-color: rgb(0, 240, 0); /* Green */
+  box-shadow: 0 0 10px rgba(0, 240, 0, 0.7);
 }
 
 .bg-tetris-t {
   background-color: rgb(160, 0, 240); /* Purple */
+  box-shadow: 0 0 10px rgba(160, 0, 240, 0.7);
 }
 
 .bg-tetris-z {
   background-color: rgb(240, 0, 0); /* Red */
+  box-shadow: 0 0 10px rgba(240, 0, 0, 0.7);
 }
 
 .bg-tetris-bg {
-  background-color: #1a1a2e;
+  background-color: rgba(20, 20, 40, 0.7);
 }
 
 .bg-tetris-border {
-  background-color: #4a5568;
+  background-color: rgba(80, 100, 140, 0.8);
 }
 
 .tetris-block {
@@ -54,9 +240,13 @@
 }
 
 .game-grid-cell {
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .font-game {
   font-family: 'Press Start 2P', system-ui, sans-serif;
+}
+
+.tetris-title {
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
 }

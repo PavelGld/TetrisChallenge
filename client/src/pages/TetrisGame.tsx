@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import GameBoard from '@/components/game/GameBoard';
 import InfoPanel from '@/components/game/InfoPanel';
+import BackgroundMusic from '@/components/game/BackgroundMusic';
 import { useTetris } from '@/hooks/use-tetris';
 
 export default function TetrisGame() {
@@ -65,10 +66,29 @@ export default function TetrisGame() {
 
   return (
     <div className="text-white font-main">
+      {/* Space background */}
+      <div className="space-background">
+        <div className="stars"></div>
+        <div className="stars2"></div>
+        <div className="stars3"></div>
+      </div>
+      
+      {/* Background Music */}
+      <BackgroundMusic isPlaying={isGameActive} />
+      
       <div className="container mx-auto px-4 py-8 flex flex-col items-center">
         {/* Game Title */}
-        <h1 className="font-game text-xl sm:text-3xl md:text-4xl mb-4 text-center text-cyan-300 tracking-wider">
-          TETRIS
+        <h1 className="font-game text-xl sm:text-3xl md:text-4xl mb-4 text-center tracking-wider tetris-title"
+            style={{
+              background: 'linear-gradient(to right, #00f2fe, #4facfe, #7a67ee)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+              textShadow: '0 0 20px rgba(77, 213, 254, 0.4)',
+              letterSpacing: '0.15em'
+            }}
+        >
+          COSMIC TETRIS
         </h1>
         
         {/* Main Game Container */}
@@ -120,9 +140,11 @@ export default function TetrisGame() {
         </div>
         
         {/* Footer */}
-        <div className="mt-8 text-center text-xs text-gray-400">
-          <p>Controls: Arrow keys to move and rotate, Space to drop</p>
-          <p className="mt-1">© {new Date().getFullYear()} Tetris Game</p>
+        <div className="mt-8 text-center text-xs text-cyan-700">
+          <p className="bg-gradient-to-r from-cyan-300 to-blue-400 text-transparent bg-clip-text font-medium">
+            Controls: Arrow keys to move and rotate, Space to drop
+          </p>
+          <p className="mt-1 opacity-70">© {new Date().getFullYear()} Cosmic Tetris</p>
         </div>
       </div>
     </div>
