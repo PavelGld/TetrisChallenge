@@ -12,14 +12,29 @@ export default function NextPiece({ nextPiece }: NextPieceProps) {
     // Define a 4x4 grid for the next piece
     const grid = Array.from({ length: 4 }, () => Array(4).fill(false));
     
-    // Map the nextPiece shape to the grid
+    // Calculate offsets to center the piece in the 4x4 grid
+    const pieceHeight = nextPiece.shape.length;
+    const pieceWidth = nextPiece.shape[0].length;
+    const offsetY = Math.floor((4 - pieceHeight) / 2);
+    const offsetX = Math.floor((4 - pieceWidth) / 2);
+    
+    // Map the nextPiece shape to the grid with centering
     nextPiece.shape.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value) {
-          grid[y][x] = true;
+          // Add centering offsets
+          const gridY = y + offsetY;
+          const gridX = x + offsetX;
+          
+          // Make sure we don't go out of bounds
+          if (gridY >= 0 && gridY < 4 && gridX >= 0 && gridX < 4) {
+            grid[gridY][gridX] = true;
+          }
         }
       });
     });
+    
+    console.log("Next piece:", nextPiece.type, "shape:", JSON.stringify(nextPiece.shape));
     
     return (
       <div className="grid grid-cols-4 grid-rows-4 gap-0 w-24 h-24">

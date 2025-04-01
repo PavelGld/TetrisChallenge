@@ -18,6 +18,8 @@ export default function TetrisGame() {
     isPaused,
     gameBoard,
     nextPiece,
+    currentPiece,
+    currentPosition,
   } = useTetris();
 
   // Setup keyboard controls
@@ -73,6 +75,8 @@ export default function TetrisGame() {
         <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-6 w-full max-w-6xl">
           <GameBoard 
             gameBoard={gameBoard}
+            currentPiece={currentPiece}
+            currentPosition={currentPosition}
             isGameOver={gameState.isGameOver}
             isPaused={isPaused}
             restartGame={restartGame}

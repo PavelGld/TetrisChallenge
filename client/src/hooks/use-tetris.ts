@@ -364,6 +364,7 @@ export function useTetris() {
     gameState,
     gameBoard,
     currentPiece,
+    currentPosition,
     nextPiece,
     isGameActive,
     isPaused,
