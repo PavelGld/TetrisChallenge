@@ -1,6 +1,23 @@
+/**
+ * Компонент GameBoard - отображает игровое поле Тетриса
+ * 
+ * Этот компонент отвечает за визуализацию игрового поля, текущей падающей фигуры,
+ * приземлившихся блоков и состояний "Игра окончена" и "Пауза".
+ */
+
 import React from 'react';
 import { Block, Tetromino } from '@/lib/tetris';
 
+/**
+ * Интерфейс для свойств компонента GameBoard
+ * 
+ * @property gameBoard - Двумерный массив, представляющий состояние игрового поля
+ * @property currentPiece - Текущая активная (падающая) фигура
+ * @property currentPosition - Позиция текущей фигуры на игровом поле
+ * @property isGameOver - Флаг, показывающий, окончена ли игра
+ * @property isPaused - Флаг, показывающий, находится ли игра на паузе
+ * @property restartGame - Функция для перезапуска игры
+ */
 interface GameBoardProps {
   gameBoard: (Block | null)[][];
   currentPiece: Tetromino | null;
@@ -10,6 +27,12 @@ interface GameBoardProps {
   restartGame: () => void;
 }
 
+/**
+ * Компонент игровой доски Тетрис
+ * 
+ * @param props - Свойства компонента GameBoard
+ * @returns JSX элемент игровой доски
+ */
 export default function GameBoard({ 
   gameBoard, 
   currentPiece, 
@@ -18,22 +41,35 @@ export default function GameBoard({
   isPaused, 
   restartGame 
 }: GameBoardProps) {
-  // Render the active falling piece
+  /**
+   * Рендерит текущую активную (падающую) фигуру
+   * 
+   * Функция преобразует абстрактное представление фигуры в набор
+   * визуальных блоков, расположенных на игровом поле в соответствии 
+   * с текущей позицией фигуры.
+   * 
+   * @returns Массив JSX элементов, представляющих блоки активной фигуры,
+   *          или null, если текущей фигуры нет
+   */
   const renderActivePiece = () => {
+    // Если нет текущей фигуры, ничего не рендерим
     if (!currentPiece) return null;
     
-    // Create an array to hold all the block elements
+    // Массив для хранения JSX элементов блоков
     const blocks = [];
     
-    // Loop through the current piece shape
+    // Перебираем матрицу формы текущей фигуры
     for (let y = 0; y < currentPiece.shape.length; y++) {
       for (let x = 0; x < currentPiece.shape[y].length; x++) {
+        // Если в этой позиции есть блок (true)
         if (currentPiece.shape[y][x]) {
+          // Рассчитываем координаты блока на игровом поле
           const boardX = x + currentPosition.x;
           const boardY = y + currentPosition.y;
           
-          // Check if piece is within visible board boundaries
+          // Проверяем, находится ли блок в пределах видимого поля
           if (boardY >= 0 && boardY < 20 && boardX >= 0 && boardX < 10) {
+            // Добавляем блок в массив для рендеринга
             blocks.push(
               <div
                 key={`active-${x}-${y}-${boardX}-${boardY}`}
@@ -45,7 +81,7 @@ export default function GameBoard({
                   left: `${boardX * 10}%`,
                   boxShadow: 'inset 3px 3px 6px rgba(255, 255, 255, 0.4), inset -3px -3px 6px rgba(0, 0, 0, 0.4)',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
-                  zIndex: 2
+                  zIndex: 2 // Чтобы активная фигура была всегда поверх приземлившихся блоков
                 }}
               ></div>
             );
@@ -54,7 +90,7 @@ export default function GameBoard({
       }
     }
     
-    // For debugging
+    // Для отладки: выводим информацию о текущей фигуре
     console.log('Rendering active piece:', 
       currentPiece.type, 
       'shape:', JSON.stringify(currentPiece.shape), 

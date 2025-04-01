@@ -1,3 +1,13 @@
+/**
+ * Хук useTetris - основная логика игры Тетрис
+ * 
+ * Этот хук инкапсулирует всю игровую логику Тетриса: управление фигурами,
+ * обнаружение столкновений, подсчет очков, повышение уровней и т.д.
+ * 
+ * Автор: [Ваше имя]
+ * Дата: Апрель 2025
+ */
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   createEmptyBoard, 
@@ -11,6 +21,15 @@ import {
   BOARD_WIDTH
 } from '@/lib/tetris';
 
+/**
+ * Интерфейс состояния игры
+ * 
+ * @property score - Текущий счет игрока
+ * @property level - Текущий уровень (влияет на скорость падения)
+ * @property lines - Количество очищенных линий
+ * @property highScore - Лучший результат (сохраняется в localStorage)
+ * @property isGameOver - Флаг окончания игры
+ */
 interface GameState {
   score: number;
   level: number;
@@ -19,8 +38,13 @@ interface GameState {
   isGameOver: boolean;
 }
 
+/**
+ * Основная функция-хук для игры Тетрис
+ * 
+ * @returns Объект с состоянием и методами для управления игрой Тетрис
+ */
 export function useTetris() {
-  // Game state
+  // Основное состояние игры (счет, уровень, линии и т.д.)
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     level: 1,
@@ -29,21 +53,21 @@ export function useTetris() {
     isGameOver: false
   });
   
-  // Game board
+  // Игровое поле - двумерный массив ячеек
   const [gameBoard, setGameBoard] = useState<(Block | null)[][]>(createEmptyBoard());
   
-  // Current falling piece
+  // Текущая падающая фигура и её позиция
   const [currentPiece, setCurrentPiece] = useState<Tetromino | null>(null);
   const [currentPosition, setCurrentPosition] = useState({ x: 0, y: 0 });
   
-  // Next piece
+  // Следующая фигура для предпросмотра
   const [nextPiece, setNextPiece] = useState<Tetromino | null>(null);
   
-  // Game status
+  // Статус игры: активна/пауза
   const [isGameActive, setIsGameActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   
-  // Timers
+  // Ссылка на таймер игрового цикла
   const gameLoopRef = useRef<number | null>(null);
   
   // Game speed based on level (in milliseconds)

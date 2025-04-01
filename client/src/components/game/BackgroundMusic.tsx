@@ -1,20 +1,56 @@
+/**
+ * Компонент BackgroundMusic - фоновая музыка для игры Тетрис
+ * 
+ * Этот компонент создает и управляет фоновой музыкой, используя Web Audio API
+ * для синтезирования классической мелодии Тетриса вместо загрузки mp3-файла.
+ * Музыка воспроизводится во время активной игры и имеет кнопку включения/выключения.
+ * 
+ * @author Ваше имя
+ * @version 1.0
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 
+/**
+ * Интерфейс свойств компонента BackgroundMusic
+ * 
+ * @property isPlaying - Флаг, показывающий, активна ли игра (для автозапуска/остановки музыки)
+ */
 interface BackgroundMusicProps {
   isPlaying: boolean;
 }
 
+/**
+ * Компонент фоновой музыки для игры Тетрис
+ * 
+ * @param props - Свойства компонента BackgroundMusic
+ * @returns JSX элемент управления музыкой
+ */
 export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
+  // Состояние отключения звука
   const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
   
-  // Создаем и начинаем синтезированную музыку
+  // Ссылки на аудио-элементы
+  const audioRef = useRef<HTMLAudioElement | null>(null);        // Резервный аудио-элемент
+  const audioContextRef = useRef<AudioContext | null>(null);     // Web Audio API контекст
+  const oscillatorRef = useRef<OscillatorNode | null>(null);     // Генератор звуковых волн
+  
+  /**
+   * Эффект для создания и воспроизведения синтезированной музыки
+   * 
+   * Использует Web Audio API для создания звуков из последовательности нот
+   * без необходимости загрузки внешних аудиофайлов. Воспроизводит классическую
+   * мелодию Тетриса в 8-битном стиле, повторяя её циклически.
+   */
   useEffect(() => {
-    // Функция для создания последовательности нот Тетрис мелодии
+    /**
+     * Создает синтезированную мелодию Тетриса
+     * 
+     * @returns Функция для очистки ресурсов (отмена таймеров, закрытие аудио-контекста)
+     */
     const createTetrisTheme = () => {
       try {
+        // Инициализация Web Audio API
         if (!audioContextRef.current) {
           // @ts-ignore - AudioContext может не поддерживаться в старых браузерах
           const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -23,9 +59,9 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
         
         const ctx = audioContextRef.current;
         
-        // Создаем гейн-нод для управления громкостью
+        // Создаем узел усиления для управления громкостью
         const gainNode = ctx.createGain();
-        gainNode.gain.value = 0.15; // Устанавливаем низкую громкость
+        gainNode.gain.value = 0.15; // Устанавливаем низкую громкость (15%)
         gainNode.connect(ctx.destination);
         
         // Основная мелодия Тетриса (ноты в виде частот)
@@ -99,7 +135,10 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
     }
   }, [isPlaying, isMuted]);
   
-  // Control audio element playback (fallback)
+  /**
+   * Эффект для управления воспроизведением резервного аудио-элемента
+   * Используется как запасной вариант, если Web Audio API недоступен
+   */
   useEffect(() => {
     if (audioRef.current) {
       if (isPlaying && !isMuted) {
@@ -112,21 +151,30 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
     }
   }, [isPlaying, isMuted]);
   
-  // Set volume for audio element
+  /**
+   * Эффект для установки громкости резервного аудио-элемента
+   * Выполняется один раз при монтировании компонента
+   */
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.3; // 30% volume
+      audioRef.current.volume = 0.3; // 30% громкости
     }
   }, []);
   
+  /**
+   * Переключает режим без звука
+   * 
+   * Изменяет состояние mute и приостанавливает/возобновляет воспроизведение
+   * в зависимости от текущего состояния.
+   */
   const toggleMute = () => {
     setIsMuted(!isMuted);
     
-    // Если есть активный Audio Context, приостановить его при включении тишины
+    // Управление Web Audio API контекстом в зависимости от состояния звука
     if (!isMuted && audioContextRef.current) {
-      audioContextRef.current.suspend();
+      audioContextRef.current.suspend(); // Приостановить аудио при включении режима без звука
     } else if (isMuted && audioContextRef.current) {
-      audioContextRef.current.resume();
+      audioContextRef.current.resume();  // Возобновить аудио при выключении режима без звука
     }
   };
   
