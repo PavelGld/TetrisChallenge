@@ -55,12 +55,24 @@ export default function TetrisGame() {
     };
   }, [isGameActive, isPaused, moveLeft, moveRight, softDrop, hardDrop, rotate]);
 
-  // Handle pause/resume toggle
+  /**
+   * Обрабатывает нажатие на кнопку Start/Pause/Resume
+   * 
+   * Если игра не активна - запускает новую игру
+   * Если игра активна и на паузе - возобновляет игру
+   * Если игра активна и не на паузе - ставит на паузу
+   */
   const togglePause = () => {
     if (!isGameActive) {
+      // Если игра не активна, инициализируем и запускаем новую игру
       startGame();
     } else {
-      isPaused ? startGame() : pauseGame();
+      // Если игра активна, переключаем состояние паузы
+      if (isPaused) {
+        startGame(); // Возобновляем игру после паузы
+      } else {
+        pauseGame(); // Ставим игру на паузу
+      }
     }
   };
 
