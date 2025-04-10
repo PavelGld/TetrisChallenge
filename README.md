@@ -1,6 +1,6 @@
 # Cosmic Tetris
 
-Классическая игра Тетрис с космической темой, реализованная на React и TypeScript.
+Классическая игра Тетрис с космической темой, реализованная на React и TypeScript. Ссылка для пробного онлайн запуска: https://tetris-challenge.replit.app
 
 ![Cosmic Tetris Game](attached_assets/Снимок%20экрана%20(7732).png)
 
@@ -80,6 +80,8 @@ npm run dev
   - `InfoPanel.tsx` - Панель с информацией (счет, уровень и т.д.)
   - `NextPiece.tsx` - Предпросмотр следующей фигуры
   - `Controls.tsx` - Элементы управления игрой
+ 
+  
 
 ---
 
