@@ -403,6 +403,8 @@ export function useTetris() {
             const newTetrisCount = tetrisCount + 1;
             localStorage.setItem('tetris-count', newTetrisCount.toString());
             
+            // Выводим информацию о текущем прогрессе достижения в консоль
+            // Это помогает игроку отслеживать прогресс в получении достижения "Тетрис-мастер"
             console.log(`Тетрис! Счетчик Тетрисов: ${newTetrisCount}/5`);
             
             // Если это 5-й Тетрис, разблокируем достижение
@@ -623,13 +625,19 @@ export function useTetris() {
     // Generate next tetromino
     setNextPiece(generateRandomTetromino());
     
-    // Для удобства тестирования - сбрасываем счетчик Тетрисов при перезапуске
-  // только если достижение не разблокировано
-  const tetrisMasterIndex = gameState.achievements.findIndex(a => a.id === 'tetris-master');
-  if (tetrisMasterIndex !== -1 && !gameState.achievements[tetrisMasterIndex].unlocked) {
-    localStorage.setItem('tetris-count', '0');
-    console.log('Счетчик Тетрисов сброшен.');
-  }
+    /**
+     * Сбрасываем счетчик Тетрисов при запуске новой игры
+     * 
+     * Для удобства тестирования и улучшения игрового процесса сбрасываем счетчик
+     * очистки 4 линий (Тетрисов) при каждом перезапуске игры.
+     * Сброс происходит только если соответствующее достижение еще не разблокировано,
+     * чтобы не мешать уже полученным достижениям.
+     */
+    const tetrisMasterIndex = gameState.achievements.findIndex(a => a.id === 'tetris-master');
+    if (tetrisMasterIndex !== -1 && !gameState.achievements[tetrisMasterIndex].unlocked) {
+      localStorage.setItem('tetris-count', '0');
+      console.log('Счетчик Тетрисов сброшен.');
+    }
 
   // Reset game state, but keep achievements and galaxy points
   setGameState(prev => ({
