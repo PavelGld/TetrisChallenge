@@ -314,22 +314,31 @@ export function useTetris() {
     console.log("Game initialized with first piece:", firstPiece.type, "at position:", startX, 0);
   }, []);
   
-  // Start/restart the game
+  /**
+   * Запускает новую игру или возобновляет игру после паузы
+   * 
+   * - Если игра окончена - инициализирует новую игру
+   * - Если игра не запущена - инициализирует и запускает новую игру
+   * - Если игра на паузе - возобновляет игру
+   */
   const startGame = useCallback(() => {
-    if (gameState.isGameOver) {
+    // Если игра окончена или ещё не начата, инициализируем новую
+    if (gameState.isGameOver || !isGameActive) {
       initializeGame();
+      setIsGameActive(true);
     } else {
+      // Если игра уже идёт, снимаем с паузы
       setIsPaused(false);
     }
     
-    // Clear any existing game loop
+    // Очищаем все существующие игровые циклы
     if (gameLoopRef.current) {
       clearInterval(gameLoopRef.current);
     }
     
-    // Start a new game loop
+    // Запускаем новый игровой цикл
     gameLoopRef.current = window.setInterval(gameLoop, getGameSpeed());
-  }, [gameState.isGameOver, initializeGame, gameLoop, getGameSpeed]);
+  }, [gameState.isGameOver, isGameActive, initializeGame, gameLoop, getGameSpeed]);
   
   // Pause the game
   const pauseGame = useCallback(() => {

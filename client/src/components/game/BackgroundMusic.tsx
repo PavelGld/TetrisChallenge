@@ -42,7 +42,10 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
    * без необходимости загрузки внешних аудиофайлов. Воспроизводит классическую
    * мелодию Тетриса в 8-битном стиле, повторяя её циклически.
    */
+  // При изменении состояния isPlaying (запуск/остановка игры)
   useEffect(() => {
+    console.log("BackgroundMusic: isPlaying changed to", isPlaying);
+    
     /**
      * Создает синтезированную мелодию Тетриса
      * 
@@ -50,11 +53,16 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
      */
     const createTetrisTheme = () => {
       try {
-        // Инициализация Web Audio API
-        if (!audioContextRef.current) {
+        // Инициализация Web Audio API - переинициализируем контекст, если необходимо
+        if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
           // @ts-ignore - AudioContext может не поддерживаться в старых браузерах
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           audioContextRef.current = new AudioContext();
+          console.log("Created new AudioContext");
+        } else if (audioContextRef.current.state === 'suspended') {
+          // Возобновляем контекст, если он приостановлен
+          audioContextRef.current.resume().catch(console.error);
+          console.log("Resumed AudioContext");
         }
         
         const ctx = audioContextRef.current;
@@ -125,13 +133,26 @@ export default function BackgroundMusic({ isPlaying }: BackgroundMusicProps) {
     };
     
     if (isPlaying && !isMuted) {
+      // Запускаем музыку и получаем функцию очистки
       const cleanup = createTetrisTheme();
+      
+      // Возвращаем функцию очистки, которая будет вызвана при размонтировании компонента
+      // или при изменении зависимостей (isPlaying, isMuted)
       return () => {
+        // Очищаем интервал воспроизведения
         if (cleanup) cleanup();
-        if (audioContextRef.current) {
-          audioContextRef.current.close().catch(console.error);
+        
+        // Не закрываем контекст полностью, а только приостанавливаем его
+        // чтобы при перезапуске игры можно было возобновить
+        if (audioContextRef.current && audioContextRef.current.state === 'running') {
+          audioContextRef.current.suspend().catch(console.error);
+          console.log("Audio context suspended, not closed");
         }
       };
+    } else if (!isPlaying && audioContextRef.current) {
+      // Если игра остановлена, приостанавливаем аудио-контекст вместо закрытия
+      audioContextRef.current.suspend().catch(console.error);
+      console.log("Game stopped, suspending audio context");
     }
   }, [isPlaying, isMuted]);
   
