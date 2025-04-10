@@ -129,6 +129,9 @@ export default function TetrisGame() {
             rotate={rotate}
             softDrop={softDrop}
             hardDrop={hardDrop}
+            // Передаем данные о галактических очках и достижениях
+            galaxyPoints={gameState.galaxyPoints}
+            achievements={gameState.achievements}
           />
         </div>
         
