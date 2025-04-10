@@ -403,6 +403,8 @@ export function useTetris() {
             const newTetrisCount = tetrisCount + 1;
             localStorage.setItem('tetris-count', newTetrisCount.toString());
             
+            console.log(`Тетрис! Счетчик Тетрисов: ${newTetrisCount}/5`);
+            
             // Если это 5-й Тетрис, разблокируем достижение
             if (newTetrisCount >= 5) {
               updatedAchievements[tetrisMasterIndex].unlocked = true;
@@ -621,27 +623,35 @@ export function useTetris() {
     // Generate next tetromino
     setNextPiece(generateRandomTetromino());
     
-    // Reset game state, but keep achievements and galaxy points
-    setGameState(prev => ({
-      ...prev,
-      score: 0,
-      level: 1,
-      lines: 0,
-      isGameOver: false,
-      // Сохраняем галактические очки и достижения между играми
-      galaxyPoints: prev.galaxyPoints,
-      achievements: prev.achievements,
-      totalLinesCleared: prev.totalLinesCleared,
-      totalPiecesPlaced: prev.totalPiecesPlaced,
-      totalHardDrops: prev.totalHardDrops
-    }));
+    // Для удобства тестирования - сбрасываем счетчик Тетрисов при перезапуске
+  // только если достижение не разблокировано
+  const tetrisMasterIndex = gameState.achievements.findIndex(a => a.id === 'tetris-master');
+  if (tetrisMasterIndex !== -1 && !gameState.achievements[tetrisMasterIndex].unlocked) {
+    localStorage.setItem('tetris-count', '0');
+    console.log('Счетчик Тетрисов сброшен.');
+  }
+
+  // Reset game state, but keep achievements and galaxy points
+  setGameState(prev => ({
+    ...prev,
+    score: 0,
+    level: 1,
+    lines: 0,
+    isGameOver: false,
+    // Сохраняем галактические очки и достижения между играми
+    galaxyPoints: prev.galaxyPoints,
+    achievements: prev.achievements,
+    totalLinesCleared: prev.totalLinesCleared,
+    totalPiecesPlaced: prev.totalPiecesPlaced,
+    totalHardDrops: prev.totalHardDrops
+  }));
     
     // Set game status
     setIsGameActive(true);
     setIsPaused(false);
     
     console.log("Game initialized with first piece:", firstPiece.type, "at position:", startX, 0);
-  }, []);
+  }, [gameState]);
   
   /**
    * Запускает новую игру или возобновляет игру после паузы
