@@ -548,23 +548,39 @@ export function useTetris() {
     }
   }, [gameBoard, currentPiece, currentPosition, isGameActive, isPaused, playSound]);
   
-  // Hard drop the piece
+  /**
+   * Жесткий сброс фигуры (мгновенное падение)
+   * 
+   * Эта функция мгновенно перемещает текущую фигуру в самую нижнюю
+   * возможную позицию на игровом поле и обрабатывает ее приземление.
+   * За жесткий сброс начисляются дополнительные очки (2 очка за каждую пройденную клетку).
+   */
   const hardDrop = useCallback(() => {
     if (!isGameActive || isPaused || !currentPiece) return;
+    
+    console.log("Hard drop initiated");
     
     let dropDistance = 0;
     let newY = currentPosition.y;
     
-    // Find the furthest possible position
+    // Находим самую нижнюю возможную позицию для фигуры
     while (!checkCollision(gameBoard, currentPiece.shape, { x: currentPosition.x, y: newY + 1 })) {
       newY++;
       dropDistance++;
     }
     
-    // Update position
-    setCurrentPosition(prev => ({ ...prev, y: newY }));
+    console.log(`Drop distance: ${dropDistance}, new Y: ${newY}`);
     
-    // Add score based on drop distance (2 points per cell) and track hard drops for achievements
+    if (dropDistance === 0) {
+      // Если нет возможности для падения, просто обрабатываем приземление
+      handlePieceLanded();
+      return;
+    }
+    
+    // Обновляем позицию фигуры
+    setCurrentPosition({ x: currentPosition.x, y: newY });
+    
+    // Добавляем очки за жесткое падение и отслеживаем статистику для достижений
     setGameState(prev => {
       const totalHardDrops = prev.totalHardDrops + 1;
       
@@ -596,15 +612,17 @@ export function useTetris() {
       };
     });
     
-    // Сохраняем обновленную статистику
-    saveStats(gameState);
-    
-    // Play drop sound
+    // Воспроизводим звук падения
     playSound('drop');
     
-    // Piece landed instantly
-    handlePieceLanded();
-  }, [gameBoard, currentPiece, currentPosition, isGameActive, isPaused, playSound, handlePieceLanded, gameState, saveStats]);
+    // Обрабатываем приземление фигуры
+    // Важно: вызываем handlePieceLanded после всех обновлений состояния,
+    // чтобы убедиться, что все изменения применены правильно
+    setTimeout(() => {
+      handlePieceLanded();
+    }, 0);
+    
+  }, [gameBoard, currentPiece, currentPosition, isGameActive, isPaused, playSound, handlePieceLanded]);
   
   // Initialize the game
   const initializeGame = useCallback(() => {
