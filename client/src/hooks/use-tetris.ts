@@ -549,74 +549,162 @@ export function useTetris() {
   }, [gameBoard, currentPiece, currentPosition, isGameActive, isPaused, playSound]);
   
   /**
-   * Жесткий сброс фигуры (мгновенное падение)
+   * Функция жесткого сброса (мгновенное падение фигуры)
    * 
-   * Эта функция мгновенно перемещает текущую фигуру в самую нижнюю
-   * возможную позицию на игровом поле и обрабатывает ее приземление.
-   * За жесткий сброс начисляются дополнительные очки (2 очка за каждую пройденную клетку).
+   * Мгновенно перемещает фигуру в самую нижнюю возможную позицию
+   * и сразу же интегрирует ее в игровое поле, обрабатывая очистку линий
+   * и другие эффекты приземления.
    */
   const hardDrop = useCallback(() => {
-    if (!isGameActive || isPaused || !currentPiece) return;
+    if (!isGameActive || isPaused || !currentPiece) {
+      console.log("Hard drop not available: game inactive or paused");
+      return;
+    }
     
-    console.log("Hard drop initiated");
+    console.log("Hard drop initiated for", currentPiece.type);
     
-    // Копируем текущее состояние для манипуляций
-    let newX = currentPosition.x;
-    let newY = currentPosition.y;
+    // Шаг 1: Находим нижнюю позицию для фигуры
     let dropDistance = 0;
+    let targetY = currentPosition.y;
     
-    // Находим самую нижнюю возможную позицию для фигуры
-    while (!checkCollision(gameBoard, currentPiece.shape, { x: newX, y: newY + 1 })) {
-      newY++;
+    // Определяем, насколько фигура может упасть
+    while (!checkCollision(gameBoard, currentPiece.shape, { x: currentPosition.x, y: targetY + 1 })) {
+      targetY++;
       dropDistance++;
     }
     
-    console.log(`Drop distance: ${dropDistance}, new Y: ${newY}`);
+    console.log(`Hard drop: distance ${dropDistance}, final Y: ${targetY}`);
     
+    // Если фигура не может падать дальше, просто обрабатываем как обычное приземление
     if (dropDistance === 0) {
-      // Если нет возможности для падения, просто обрабатываем приземление
       handlePieceLanded();
       return;
     }
     
-    // Обновляем позицию фигуры немедленно
-    setCurrentPosition({ x: newX, y: newY });
+    // Шаг 2: Создаем новую доску с объединенной фигурой
+    const newBoard = mergeTetrominoWithBoard(gameBoard, currentPiece, { x: currentPosition.x, y: targetY });
     
-    // Добавляем очки за жесткое падение и отслеживаем для достижений
+    // Шаг 3: Проверяем и очищаем заполненные линии
+    const { clearedBoard, linesCleared } = clearLines(newBoard);
+    
+    // Шаг 4: Обновляем игровую доску
+    setGameBoard(clearedBoard);
+    
+    // Шаг 5: Обрабатываем очистку линий и начисление очков
+    let tetrisAchievement = false;
+    let pointsScored = dropDistance * 2; // Базовые очки за hard drop
+    
+    if (linesCleared > 0) {
+      // Дополнительные очки за очистку линий
+      switch (linesCleared) {
+        case 1: pointsScored += 100 * gameState.level; break;
+        case 2: pointsScored += 300 * gameState.level; break;
+        case 3: pointsScored += 500 * gameState.level; break;
+        case 4: 
+          pointsScored += 800 * gameState.level; 
+          tetrisAchievement = true;
+          break;
+      }
+      
+      // Воспроизводим звук очистки
+      playSound('clear');
+    } else {
+      // Только звук падения, если линии не очищены
+      playSound('drop');
+    }
+    
+    // Шаг 6: Обновляем статистику и состояние игры
+    const newLinesTotal = gameState.lines + linesCleared;
+    const newTotalLinesCleared = gameState.totalLinesCleared + linesCleared;
+    const newLevel = Math.floor(newLinesTotal / 10) + 1;
+    const newTotalPiecesPlaced = gameState.totalPiecesPlaced + 1;
     const newTotalHardDrops = gameState.totalHardDrops + 1;
+    
+    // Проверяем достижения
     let updatedAchievements = [...gameState.achievements];
     let galaxyPointsEarned = 0;
     
-    // Проверяем достижение hard-dropper
+    // Hard-dropper достижение
     if (newTotalHardDrops >= 50) {
       const hardDropperIndex = updatedAchievements.findIndex(a => a.id === 'hard-dropper');
-      
       if (hardDropperIndex !== -1 && !updatedAchievements[hardDropperIndex].unlocked) {
         updatedAchievements[hardDropperIndex].unlocked = true;
         galaxyPointsEarned += updatedAchievements[hardDropperIndex].points;
-        
         console.log(`Achievement unlocked: ${updatedAchievements[hardDropperIndex].name}`);
-        localStorage.setItem('tetris-achievements', JSON.stringify(updatedAchievements));
       }
     }
     
-    // Обновляем состояние игры с новыми очками
+    // Tetris достижение
+    if (tetrisAchievement) {
+      const tetrisMasterIndex = updatedAchievements.findIndex(a => a.id === 'tetris-master');
+      if (tetrisMasterIndex !== -1 && !updatedAchievements[tetrisMasterIndex].unlocked) {
+        // Считаем предыдущее количество Тетрисов
+        const tetrisCount = localStorage.getItem('tetris-count') ? 
+                           parseInt(localStorage.getItem('tetris-count') || '0') : 0;
+        
+        // Увеличиваем счетчик Тетрисов
+        const newTetrisCount = tetrisCount + 1;
+        localStorage.setItem('tetris-count', newTetrisCount.toString());
+        
+        // Выводим информацию о текущем прогрессе достижения
+        console.log(`Тетрис! Счетчик Тетрисов: ${newTetrisCount}/5`);
+        
+        // Если это 5-й Тетрис, разблокируем достижение
+        if (newTetrisCount >= 5) {
+          updatedAchievements[tetrisMasterIndex].unlocked = true;
+          galaxyPointsEarned += updatedAchievements[tetrisMasterIndex].points;
+          console.log(`Achievement unlocked: ${updatedAchievements[tetrisMasterIndex].name}`);
+        }
+      }
+    }
+    
+    // Обновляем состояние игры
     setGameState(prev => ({
       ...prev,
-      score: prev.score + dropDistance * 2,
+      score: prev.score + pointsScored,
+      lines: newLinesTotal,
+      level: newLevel,
+      totalLinesCleared: newTotalLinesCleared,
+      totalPiecesPlaced: newTotalPiecesPlaced,
       totalHardDrops: newTotalHardDrops,
       achievements: updatedAchievements,
       galaxyPoints: prev.galaxyPoints + galaxyPointsEarned
     }));
     
-    // Воспроизводим звук падения
-    playSound('drop');
+    // Сохраняем достижения, если есть изменения
+    if (galaxyPointsEarned > 0) {
+      localStorage.setItem('tetris-achievements', JSON.stringify(updatedAchievements));
+      localStorage.setItem('tetris-galaxy-points', (gameState.galaxyPoints + galaxyPointsEarned).toString());
+    }
     
-    // Вызываем обработчик приземления фигуры сразу после перемещения
-    // для немедленного слияния с полем
-    handlePieceLanded();
+    // Шаг 7: Проверяем на конец игры
+    // Генерируем следующую фигуру
+    const newPiece = nextPiece;
+    if (!newPiece) {
+      console.error("No next piece available!");
+      return;
+    }
     
-  }, [gameBoard, currentPiece, currentPosition, isGameActive, isPaused, gameState, playSound, handlePieceLanded]);
+    // Рассчитываем начальную позицию для новой фигуры
+    const newX = Math.floor((BOARD_WIDTH - newPiece.shape[0].length) / 2);
+    
+    // Проверяем на конец игры (если новая фигура сразу сталкивается)
+    if (checkCollision(clearedBoard, newPiece.shape, { x: newX, y: 0 })) {
+      console.log("Game over - collision at start position");
+      handleGameOver();
+      return;
+    }
+    
+    // Устанавливаем текущую фигуру на следующую
+    setCurrentPiece(newPiece);
+    setCurrentPosition({ x: newX, y: 0 });
+    
+    // Генерируем новую следующую фигуру
+    setNextPiece(generateRandomTetromino());
+    
+    console.log("Hard drop completed, new piece:", newPiece.type);
+    
+  }, [gameBoard, currentPiece, currentPosition, nextPiece, isGameActive, isPaused, gameState, playSound, handleGameOver]);
   
   // Initialize the game
   const initializeGame = useCallback(() => {
