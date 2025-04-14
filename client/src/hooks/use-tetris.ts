@@ -560,11 +560,13 @@ export function useTetris() {
     
     console.log("Hard drop initiated");
     
-    let dropDistance = 0;
+    // Копируем текущее состояние для манипуляций
+    let newX = currentPosition.x;
     let newY = currentPosition.y;
+    let dropDistance = 0;
     
     // Находим самую нижнюю возможную позицию для фигуры
-    while (!checkCollision(gameBoard, currentPiece.shape, { x: currentPosition.x, y: newY + 1 })) {
+    while (!checkCollision(gameBoard, currentPiece.shape, { x: newX, y: newY + 1 })) {
       newY++;
       dropDistance++;
     }
@@ -577,52 +579,44 @@ export function useTetris() {
       return;
     }
     
-    // Обновляем позицию фигуры
-    setCurrentPosition({ x: currentPosition.x, y: newY });
+    // Обновляем позицию фигуры немедленно
+    setCurrentPosition({ x: newX, y: newY });
     
-    // Добавляем очки за жесткое падение и отслеживаем статистику для достижений
-    setGameState(prev => {
-      const totalHardDrops = prev.totalHardDrops + 1;
+    // Добавляем очки за жесткое падение и отслеживаем для достижений
+    const newTotalHardDrops = gameState.totalHardDrops + 1;
+    let updatedAchievements = [...gameState.achievements];
+    let galaxyPointsEarned = 0;
+    
+    // Проверяем достижение hard-dropper
+    if (newTotalHardDrops >= 50) {
+      const hardDropperIndex = updatedAchievements.findIndex(a => a.id === 'hard-dropper');
       
-      // Проверяем достижение hard-dropper
-      let updatedAchievements = [...prev.achievements];
-      let galaxyPointsEarned = 0;
-      
-      // Если счетчик жестких сбросов достиг 50, разблокируем достижение
-      if (totalHardDrops >= 50) {
-        const hardDropperIndex = updatedAchievements.findIndex(a => a.id === 'hard-dropper');
+      if (hardDropperIndex !== -1 && !updatedAchievements[hardDropperIndex].unlocked) {
+        updatedAchievements[hardDropperIndex].unlocked = true;
+        galaxyPointsEarned += updatedAchievements[hardDropperIndex].points;
         
-        if (hardDropperIndex !== -1 && !updatedAchievements[hardDropperIndex].unlocked) {
-          updatedAchievements[hardDropperIndex].unlocked = true;
-          galaxyPointsEarned += updatedAchievements[hardDropperIndex].points;
-          
-          console.log(`Achievement unlocked: ${updatedAchievements[hardDropperIndex].name} (+${updatedAchievements[hardDropperIndex].points} galaxy points)`);
-          // Сохраняем обновленные достижения
-          localStorage.setItem('tetris-achievements', JSON.stringify(updatedAchievements));
-          localStorage.setItem('tetris-galaxy-points', (prev.galaxyPoints + galaxyPointsEarned).toString());
-        }
+        console.log(`Achievement unlocked: ${updatedAchievements[hardDropperIndex].name}`);
+        localStorage.setItem('tetris-achievements', JSON.stringify(updatedAchievements));
       }
-      
-      return {
-        ...prev,
-        score: prev.score + dropDistance * 2,
-        totalHardDrops,
-        achievements: updatedAchievements,
-        galaxyPoints: prev.galaxyPoints + galaxyPointsEarned
-      };
-    });
+    }
+    
+    // Обновляем состояние игры с новыми очками
+    setGameState(prev => ({
+      ...prev,
+      score: prev.score + dropDistance * 2,
+      totalHardDrops: newTotalHardDrops,
+      achievements: updatedAchievements,
+      galaxyPoints: prev.galaxyPoints + galaxyPointsEarned
+    }));
     
     // Воспроизводим звук падения
     playSound('drop');
     
-    // Обрабатываем приземление фигуры
-    // Важно: вызываем handlePieceLanded после всех обновлений состояния,
-    // чтобы убедиться, что все изменения применены правильно
-    setTimeout(() => {
-      handlePieceLanded();
-    }, 0);
+    // Вызываем обработчик приземления фигуры сразу после перемещения
+    // для немедленного слияния с полем
+    handlePieceLanded();
     
-  }, [gameBoard, currentPiece, currentPosition, isGameActive, isPaused, playSound, handlePieceLanded]);
+  }, [gameBoard, currentPiece, currentPosition, isGameActive, isPaused, gameState, playSound, handlePieceLanded]);
   
   // Initialize the game
   const initializeGame = useCallback(() => {
